@@ -1,0 +1,2 @@
+rootProject.name='musiq'
+include ':app', ':spotify-app-remote'

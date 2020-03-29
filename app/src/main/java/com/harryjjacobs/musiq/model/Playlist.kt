@@ -1,6 +1,5 @@
 package com.harryjjacobs.musiq.model
 
-class Playlist {
-    private var name: String = "";
+class Playlist(var name: String) {
 
 }

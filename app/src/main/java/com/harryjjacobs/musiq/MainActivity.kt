@@ -1,12 +1,13 @@
 package com.harryjjacobs.musiq
 
 import android.os.Bundle
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
+import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 import androidx.viewpager.widget.ViewPager
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import com.harryjjacobs.musiq.ui.SectionsPagerAdapter
+import com.harryjjacobs.musiq.ui.itemlist.dummy.DummyContent
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,11 +22,6 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
-        val fab: FloatingActionButton = findViewById(R.id.fab)
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
+        val progressBar: ProgressBar = findViewById(R.id.music_progress);
     }
 }

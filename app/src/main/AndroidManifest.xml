@@ -16,10 +16,11 @@
             android:name=".SpotifyAppRemoteService"
             android:enabled="true"
             android:exported="true"/>
-        <activity android:name=".ui.SpotifyLoginActivity">
+        <activity
+            android:name=".ui.InitialisationActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -1,15 +1,11 @@
 package com.harryjjacobs.musiq.ui
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.AttributeSet
 import android.util.Log
-import android.view.View
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
+import com.harryjjacobs.musiq.App
 import com.harryjjacobs.musiq.R
 import com.harryjjacobs.musiq.spotify.SpotifyAuthHelper
 import com.harryjjacobs.musiq.spotify.SpotifyAuthHelper.CLIENT_ID
@@ -18,12 +14,12 @@ import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import com.spotify.sdk.android.auth.LoginActivity.REQUEST_CODE
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-class SpotifyLoginActivity : AppCompatActivity() {
-
-    private val TAG = SpotifyLoginActivity::class.java.simpleName
-
+class InitialisationActivity : AppCompatActivity() {
     private val scopes = arrayOf(
         "user-read-email",
         "app-remote-control",
@@ -87,9 +83,13 @@ class SpotifyLoginActivity : AppCompatActivity() {
     }
 
     private fun startMainActivity() {
+        App.spotifyRepository.initialiseApi(applicationContext)
         val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()    // exit this activity
+        GlobalScope.launch {
+            delay(LAUNCH_DELAY)
+            startActivity(intent)
+            finish()    // exit this activity
+        }
     }
 
     private fun logError(msg: String) {
@@ -100,5 +100,10 @@ class SpotifyLoginActivity : AppCompatActivity() {
     private fun logMessage(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         Log.d(TAG, msg)
+    }
+
+    companion object {
+        private val TAG = InitialisationActivity::class.java.simpleName
+        private const val LAUNCH_DELAY = 1500L; // milliseconds
     }
 }

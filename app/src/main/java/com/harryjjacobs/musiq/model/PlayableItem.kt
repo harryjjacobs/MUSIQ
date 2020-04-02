@@ -99,7 +99,7 @@ class PlayableItem private constructor(
     }
 
     companion object {
-        private fun createFromPlaylist(playlist: Playlist, callback: (playableItem: PlayableItem) -> Unit) {
+        private fun createFromPlaylist(playlist: SimplePlaylist, callback: (playableItem: PlayableItem) -> Unit) {
             callback(PlayableItem(
                 name = playlist.name,
                 type = Type.SIMPLE_PLAYLIST,
@@ -110,7 +110,7 @@ class PlayableItem private constructor(
             ));
         }
 
-        private fun createFromAlbum(album: Album, callback: (playableItem: PlayableItem) -> Unit) {
+        private fun createFromAlbum(album: SimpleAlbum, callback: (playableItem: PlayableItem) -> Unit) {
             callback(PlayableItem(
                 name = album.name,
                 type = Type.SIMPLE_ALBUM,
@@ -122,19 +122,11 @@ class PlayableItem private constructor(
         }
 
         fun createFromCoreObject(api: SpotifyWebApi, album: SimpleAlbum, callback: (playableItem: PlayableItem) -> Unit) {
-            api.service.albums.getAlbum(album.uri.uri).queue {
-                it?.let {
-                    createFromAlbum(it, callback);
-                }
-            }
+            createFromAlbum(album, callback);
         }
 
         fun createFromCoreObject(api: SpotifyWebApi, playlist: SimplePlaylist, callback: (playableItem: PlayableItem) -> Unit) {
-            api.service.playlists.getPlaylist(playlist.uri.uri).queue {
-                it?.let {
-                    createFromPlaylist(it, callback);
-                }
-            };
+            createFromPlaylist(playlist, callback);
         }
 
     }

@@ -1,32 +1,26 @@
 package com.harryjjacobs.musiq.ui.sections.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.harryjjacobs.musiq.App
 import com.harryjjacobs.musiq.R
-import com.harryjjacobs.musiq.model.Playlist
+import com.harryjjacobs.musiq.model.PlayableItemList
 import com.harryjjacobs.musiq.ui.lists.ListFactory
-import com.harryjjacobs.musiq.ui.sections.playlist.PlaylistActivity
-
+import com.harryjjacobs.musiq.ui.sections.search.SearchFragment
 
 /**
  * The fragment containing the home view
  */
 class HomeFragment : Fragment() {
-
-    private lateinit var homeViewModel: HomeViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java).apply {
-            setPageIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
-        }
-    }
+    private lateinit var viewModel: HomeViewModel
+    private lateinit var loadingIndicator: ProgressBar
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -34,29 +28,67 @@ class HomeFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
+        val listsContainer = root.findViewById<LinearLayout>(R.id.lists_container)
+        loadingIndicator = root.findViewById(R.id.loading_indicator)
+        initViewModel()
 
-        val list1 = ListFactory.createHorizontalPlaylistList(
-            context = requireContext(),
-            playlists = listOf(Playlist("Acid Jazz"), Playlist("Songs to dab to"), Playlist("Cheesy Hits")),
-            title = "Jump back in..."
-        );
-        val list2 = ListFactory.createHorizontalPlaylistList(
-            requireContext(),
-            playlists = listOf(Playlist("Shrek 2 Soundtrack"), Playlist("Dark Side of the Moon"), Playlist("Butt"), Playlist("Harry's Playlist")),
-            title = "Recommended..."
-        );
+        // Show that we are loading data
+        showLoadingIndicator()
 
-        with(root.findViewById<LinearLayout>(R.id.home_layout)) {
-            addView(list1);
-            addView(list2);
+        // Fetch lists to display
+        viewModel.getPlayableItemLists().forEach {
+            addList(it, listsContainer)
         }
 
-        /*val textView: TextView = root.findViewById(R.id.section_label)
-        homeViewModel.text.observe(viewLifecycleOwner, Observer<String> {
-            textView.text = it
-        })*/
-
         return root
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+
+    }
+
+    private fun initViewModel() {
+        viewModel = ViewModelProvider(
+            this,
+            HomeViewModelFactory(App.spotifyRepository)
+        ).get(HomeViewModel::class.java).apply {
+            arguments?.getInt(ARG_SECTION_NUMBER)?.let {
+                setPageIndex(it);
+            }
+        }
+    }
+
+    private fun addList(
+        playableItemList: PlayableItemList,
+        container: LinearLayout
+    ) {
+        // Container for the list
+        val featuredPlayablesContainer =
+            ListFactory.createListContainer(requireContext())
+        // Add the container in advance in case we want to TODO(show placeholder icons)
+        container.addView(featuredPlayablesContainer)
+        // Listen for state change indicating that the playable items have loaded
+        playableItemList.playableItems.observe(viewLifecycleOwner, Observer { playables ->
+            // Finished loading at least a bit of data
+            hideLoadingIndicator();
+            // Create and put the list in it's playables container
+            ListFactory.createHorizontalPlayablesList(
+                context = requireContext(),
+                playables = playables,
+                container = featuredPlayablesContainer,
+                title = playableItemList.listName
+            )
+        })
+    }
+
+    private fun showLoadingIndicator() {
+        loadingIndicator.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingIndicator() {
+        loadingIndicator.visibility = View.GONE
     }
 
     companion object {

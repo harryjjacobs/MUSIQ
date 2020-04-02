@@ -6,7 +6,6 @@ import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.harryjjacobs.musiq.ui.itemlist.dummy.DummyContent
 
 
 object ItemList {
@@ -15,7 +14,7 @@ object ItemList {
         layoutId: Int,
         viewHolderId: Int,
         columnCount: Int = 0,
-        items: List<TItem>,
+        playables: List<TItem>,
         createViewHolder: (view: View) -> TViewHolder,
         bindItemToHolder: (holder: TViewHolder, item: TItem) -> Unit,
         clickListener: (item: TItem) -> Unit
@@ -30,7 +29,7 @@ object ItemList {
                     columnCount <= 1 -> LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = ItemRecyclerViewAdapter(items, viewHolderId, createViewHolder, bindItemToHolder, clickListener);
+                adapter = ItemRecyclerViewAdapter(playables, viewHolderId, createViewHolder, bindItemToHolder, clickListener);
             }
         }
         return view as RecyclerView;

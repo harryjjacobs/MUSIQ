@@ -8,45 +8,53 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.harryjjacobs.musiq.R
-import com.harryjjacobs.musiq.model.Playlist
+import com.harryjjacobs.musiq.model.PlayableItem
 import com.harryjjacobs.musiq.ui.itemlist.ItemList
 import com.harryjjacobs.musiq.ui.itemlist.ItemRecyclerViewAdapter
-import com.harryjjacobs.musiq.ui.sections.playlist.PlaylistActivity
+import com.harryjjacobs.musiq.ui.playableitem.PlayableItemActivity
+import com.harryjjacobs.musiq.ui.util.Serialization.JSON
 
 object ListFactory {
-    @SuppressLint("InflateParams")
-    fun createHorizontalPlaylistList(context: Context, playlists: List<Playlist>, title: String): View {
-        val listView = ItemList.create(
+    fun createHorizontalPlayablesList(context: Context, container: LinearLayout, playables: List<PlayableItem?>, title: String) {
+        // Set title
+        container.findViewById<TextView>(R.id.hlist_title).text = title;
+        // Add list content
+        container.addView(ItemList.create(
             context,
             layoutId = R.layout.generic_horizontal_recycler,
             viewHolderId = R.layout.playlist_item,
-            items = playlists,
+            playables = playables,
             createViewHolder = { view: View ->
                 object : ItemRecyclerViewAdapter.ViewHolder(view) {
-                    val name: TextView = view.findViewById(R.id.playlist_name)
-                    val image: ImageView = view.findViewById(R.id.playlist_image);
+                    val name: TextView = view.findViewById(R.id.playable_name)
+                    val image: ImageView = view.findViewById(R.id.playable_image);
                 }
             },
             bindItemToHolder = { holder, item ->
-                holder.name.text = item.name;
-                // TODO: Set image
-                //holder.image.setImageBitmap();
+                holder.name.text = item?.name ?: "Untitled";
+                item?.images?.getOrNull(0)?.let { image ->
+                    Glide
+                        .with(context)
+                        .load(image.url)
+                        .centerInside()
+                        .placeholder(R.drawable.ic_album_white_24dp)
+                        .into(holder.image);
+                }
             },
-            clickListener = {
-                val myIntent = Intent(context, PlaylistActivity::class.java)
-                myIntent.putExtra("name", it.name) //Optional parameters
+            clickListener = { item ->
+                val myIntent = Intent(context, PlayableItemActivity::class.java)
+                myIntent.putExtra("playable", JSON.stringify(PlayableItem.serializer(), item as PlayableItem));
                 context.startActivity(myIntent)
             }
-        );
+        ));
+    }
+
+    @SuppressLint("InflateParams")
+    fun createListContainer(context: Context): LinearLayout {
         val container = LayoutInflater.from(context)
-            .inflate(R.layout.hlist_container, null);
-        if (container is LinearLayout) {
-            with(container) {
-                findViewById<TextView>(R.id.hlist_title).text = title;
-                addView(listView);
-            }
-        }
+            .inflate(R.layout.hlist_container, null) as LinearLayout;
         return container;
     }
 }

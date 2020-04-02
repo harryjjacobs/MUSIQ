@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/home_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:dividerPadding="10dp"
-    android:orientation="vertical"
-    tools:context=".ui.sections.home.HomeFragment" />
+    tools:context=".ui.sections.home.HomeFragment">
+
+    <LinearLayout
+        android:id="@+id/lists_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:dividerPadding="10dp"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/loading_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="100dp"
+            android:indeterminate="true" />
+
+    </LinearLayout>
+</ScrollView>
+

@@ -2,18 +2,14 @@ package com.harryjjacobs.musiq.ui.sections.home
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.harryjjacobs.musiq.model.PlaylistList
+import com.harryjjacobs.musiq.model.PlayableItemList
+import com.harryjjacobs.musiq.repository.SpotifyRepository
+import com.harryjjacobs.musiq.ui.sections.SectionViewModel
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(private val spotifyRepository: SpotifyRepository) : SectionViewModel() {
 
-    private val pageIndex = MutableLiveData<Int>();
-
-    fun setPageIndex(index: Int) {
-        pageIndex.value = index;
-    }
-
-    fun getPageIndex() = pageIndex.value;
-
-    private val playlistLists = MutableLiveData<PlaylistList>();
-    fun getPlaylistLists() = playlistLists;
+    fun getPlayableItemLists() = listOf(
+        PlayableItemList("Featured", spotifyRepository.getFeaturedPlaylists()),
+        PlayableItemList("Recently played", spotifyRepository.getRecentlyPlayed())
+    );
 }
